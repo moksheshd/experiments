@@ -1,48 +1,135 @@
 # Rust Practice
 
-This repository is for practicing Rust programming concepts and experimenting with the language.
+This repository is a **Cargo workspace** for experimenting with various Rust concepts and technologies. Each experiment is isolated in its own crate with independent dependencies and documentation.
+
+## Repository Structure
+
+This is a Cargo workspace containing multiple independent experiments:
+
+```
+rust-practice/
+├── Cargo.toml              # Workspace configuration
+├── README.md               # This file
+│
+├── erasure-coding/         # Erasure coding experiment
+│   ├── Cargo.toml
+│   ├── README.md           # Detailed experiment documentation
+│   ├── src/
+│   ├── examples/
+│   └── tests/
+│
+└── [future-experiments]/   # More experiments will be added here
+```
 
 ## Getting Started
 
 ### Prerequisites
-- [Rust](https://www.rust-lang.org/tools/install) installed on your system
+- [Rust](https://www.rust-lang.org/tools/install) installed on your system (version 1.56+ for workspace inheritance)
 
-### Running the Code
+### Working with Experiments
 
-To run the main program:
+#### Run a specific experiment:
 ```bash
+cargo run -p erasure-coding
+```
+
+#### Build a specific experiment:
+```bash
+cargo build -p erasure-coding
+```
+
+#### Test a specific experiment:
+```bash
+cargo test -p erasure-coding
+```
+
+#### Run an example from an experiment:
+```bash
+cargo run -p erasure-coding --example example_name
+```
+
+#### Build all experiments in the workspace:
+```bash
+cargo build --workspace
+```
+
+#### Test all experiments:
+```bash
+cargo test --workspace
+```
+
+### Working within an experiment directory
+
+You can also `cd` into any experiment directory and use standard `cargo` commands:
+
+```bash
+cd erasure-coding
 cargo run
+cargo test
+cargo build --release
 ```
 
-To build without running:
-```bash
-cargo build
-```
+## Current Experiments
 
-To check for compilation errors:
-```bash
-cargo check
-```
+### 1. Erasure Coding
+**Location**: [erasure-coding/](erasure-coding/)
 
-## Project Structure
+Exploration of erasure coding algorithms and their applications in distributed storage systems.
 
-- `src/main.rs` - Main entry point for the application
-- `Cargo.toml` - Project configuration and dependencies
-- `target/` - Build artifacts (auto-generated, ignored by git)
+**Topics**: Reed-Solomon codes, data redundancy, fault tolerance, distributed systems
+
+See [erasure-coding/README.md](erasure-coding/README.md) for detailed documentation.
+
+---
+
+## Adding New Experiments
+
+To add a new experiment to the workspace:
+
+1. Create a new directory for your experiment:
+   ```bash
+   mkdir my-experiment
+   cd my-experiment
+   cargo init
+   ```
+
+2. Add it to the workspace members in the root `Cargo.toml`:
+   ```toml
+   [workspace]
+   members = [
+       "erasure-coding",
+       "my-experiment",  # Add your new experiment here
+   ]
+   ```
+
+3. Update your experiment's `Cargo.toml` to inherit workspace settings:
+   ```toml
+   [package]
+   name = "my-experiment"
+   version.workspace = true
+   edition.workspace = true
+   ```
+
+4. Create a detailed `README.md` in your experiment directory
 
 ## Practice Areas
 
-This repository can be used to practice various Rust concepts:
-- Variables and mutability
-- Data types
-- Functions
-- Control flow
-- Ownership and borrowing
-- Structs and enums
-- Pattern matching
-- Error handling
-- Collections
-- Generics and traits
+This repository is designed for experimenting with:
+- Advanced Rust concepts and algorithms
+- Systems programming
+- Distributed systems
+- Performance optimization
+- Data structures and algorithms
+- Networking and protocols
+- Cryptography and security
 - And much more!
 
-Happy coding! 🦀
+## Resources
+
+- [The Rust Book](https://doc.rust-lang.org/book/)
+- [Rust by Example](https://doc.rust-lang.org/rust-by-example/)
+- [Cargo Workspaces Documentation](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html)
+
+---
+
+**Happy coding!**

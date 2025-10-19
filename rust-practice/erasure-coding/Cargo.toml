@@ -1,0 +1,23 @@
+[package]
+name = "erasure-coding"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Add erasure coding specific dependencies here
+# Example: reed-solomon-erasure = "6.0"
+
+[dev-dependencies]
+# Add test/benchmark dependencies here
+
+[[bin]]
+name = "erasure-coding"
+path = "src/main.rs"
+
+[lib]
+name = "erasure_coding"
+path = "src/lib.rs"
