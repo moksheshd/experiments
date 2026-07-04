@@ -1,0 +1,100 @@
+Chandrayaan-3 was a lunar exploration mission conducted by the Indian Space
+Research Organisation (ISRO), and it stands as one of the most significant
+achievements in the history of India's space program. Launched on July 14,
+2023, from the Satish Dhawan Space Centre in Sriharikota aboard an LVM3
+rocket, the mission had a clear and ambitious goal: to demonstrate a safe and
+soft landing on the surface of the Moon, to deploy a rover, and to conduct
+scientific experiments on the lunar surface. It was the follow-up to
+Chandrayaan-2, whose lander had crashed during its final descent in 2019.
+
+To understand the importance of Chandrayaan-3, it helps to look back at the
+broader arc of India's lunar ambitions. The first mission, Chandrayaan-1,
+launched in 2008, was an orbiter that made headlines around the world when its
+instruments provided some of the strongest evidence yet for the presence of
+water molecules on the Moon. That discovery reshaped scientific thinking about
+the lunar surface and hinted at the possibility of accessible water ice, a
+resource that could one day support long-term human exploration. Chandrayaan-2,
+which followed in 2019, was far more ambitious: it carried an orbiter, a lander,
+and a rover. The orbiter succeeded and continues to operate, but the Vikram
+lander lost control during the final phase of its descent and crashed into the
+lunar surface. The near-miss was heartbreaking for the team, yet it provided a
+trove of engineering data that would prove invaluable.
+
+Chandrayaan-3 was designed specifically to correct the failures of its
+predecessor. The mission consisted of three main components: a propulsion
+module, a lander named Vikram, and a rover named Pragyan. ISRO engineers made a
+series of deliberate changes based on the lessons of Chandrayaan-2. They
+strengthened the lander's legs to withstand a harder impact, widened the
+designated landing zone to give the spacecraft more room for error, added more
+fuel for contingencies, and improved the software and sensors that guide the
+autonomous descent. The team even adopted a "failure-based design" philosophy,
+deliberately asking what could go wrong at each stage and engineering the craft
+to survive those scenarios, rather than simply assuming everything would work.
+
+Rather than using a single powerful rocket to travel directly to the Moon, the
+spacecraft used a series of carefully calculated orbital maneuvers around Earth
+to gradually raise its orbit before being slung toward the Moon, a fuel-efficient
+approach that reflected ISRO's reputation for achieving ambitious goals on a
+modest budget. The entire mission cost roughly 615 crore rupees, a fraction of
+the budgets of comparable missions by other space agencies, and famously less
+than the production budget of some Hollywood space films. This frugal engineering,
+often described as the hallmark of ISRO, drew admiration from space agencies and
+observers across the globe.
+
+After a journey of several weeks, the spacecraft entered lunar orbit and began
+lowering its altitude in preparation for the descent. The final phase, often
+called the "seventeen minutes of terror," was the most nerve-wracking part of
+the mission. During this window, the Vikram lander had to autonomously slow
+itself from a speed of thousands of kilometres per hour to nearly zero, orient
+itself correctly, scan the surface for hazards, and touch down gently, all
+without any real-time control from Earth because of the communication delay and
+the speed of events. Every sequence had to execute flawlessly on its own.
+
+The defining moment came on August 23, 2023, when the Vikram lander executed a
+successful soft landing near the Moon's south pole. This made India the fourth
+country ever to achieve a soft landing on the Moon, after the Soviet Union, the
+United States, and China. More significantly, it made India the very first
+nation to land near the lunar south pole, a region of intense scientific
+interest because of the presence of water ice trapped in its permanently
+shadowed craters. The landing was watched live by millions of people across
+India and around the world, and it was met with widespread celebration. Prime
+Minister Narendra Modi, who watched the event remotely, declared it a moment
+that belonged not just to India but to all of humanity, and August 23 was later
+designated as National Space Day in India to commemorate the achievement.
+
+Following the landing, the Pragyan rover rolled out onto the lunar surface and
+began its exploration. Over the course of its operational period, which lasted
+about one lunar day (roughly fourteen Earth days), the rover and lander carried
+out a range of experiments. Instruments on board confirmed the presence of
+sulphur and detected other elements such as aluminium, iron, calcium, and
+titanium in the lunar soil. The mission also measured the temperature profile
+of the top layer of the lunar surface, revealing a surprisingly steep gradient
+between the surface and the material just a few centimetres below, and it
+studied the surrounding plasma environment, returning valuable data to
+scientists on Earth. The lander also carried a seismic instrument that recorded
+what appeared to be natural movements in the lunar surface, offering rare
+insight into the Moon's internal activity.
+
+As the long lunar night approached, bringing temperatures that plunge to well
+below minus 200 degrees Celsius, the lander and rover were put into a sleep mode
+in the hope that they might reawaken when sunlight returned. Although the
+hardware was not designed to guarantee survival through the extreme cold, the
+team held out hope. When the next lunar day dawned, ISRO attempted to
+re-establish contact, but the lander and rover did not respond, having likely
+succumbed to the frigid night. Even so, the mission had already accomplished
+every one of its primary objectives, and this final phase was considered a
+bonus attempt rather than a requirement.
+
+Chandrayaan-3's success carried significance far beyond its scientific
+findings. It demonstrated ISRO's growing technical maturity and its ability to
+recover from the earlier Chandrayaan-2 setback, applying lessons learned to
+achieve a flawless landing. It boosted national pride and inspired a new
+generation of Indian scientists and engineers, and it strengthened India's
+position as a serious and cost-effective player in the global space arena. The
+achievement also had strategic and commercial implications, enhancing India's
+credibility in the fast-growing international market for satellite launches and
+space services, and paving the way for future missions including planned solar
+observation, human spaceflight, and even more ambitious lunar and interplanetary
+projects. The mission stands as a testament to what focused engineering, careful
+planning, perseverance, and the willingness to learn from failure can
+accomplish.
