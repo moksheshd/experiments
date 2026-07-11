@@ -40,11 +40,11 @@ Authenticate with Google Application Default Credentials (once):
 gcloud auth application-default login
 ```
 
-Set the Vertex configuration (these point the `google-genai` client at the Vertex backend):
+By default the script uses your **active gcloud project** and the `global` location, so no
+extra config is needed. To override for a single run (without exporting), prefix the command:
 
 ```bash
-export GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
-export GOOGLE_CLOUD_LOCATION="global"        # or a specific location, e.g. us-central1
+GOOGLE_CLOUD_PROJECT="your-gcp-project-id" GOOGLE_CLOUD_LOCATION="us-central1" python main.py
 ```
 
 No API key is required — auth flows through GCP ADC.
@@ -53,14 +53,14 @@ No API key is required — auth flows through GCP ADC.
 
 ```bash
 # Random source and destination each run.
-# Full detail is logged by default (learning mode): the generated JSON schema,
-# the request and response payloads, and the raw JSON before validation.
+# By default (learning mode) the request (prompt + response schema) and the
+# response (token usage + JSON body) are rendered as rich panels on stderr.
 python main.py
 
 # Reproducible city selection
 python main.py --seed 42
 
-# Show only the INFO-level progress summary (hide the detailed dumps)
+# Show only the INFO-level progress summary (hide the request/response panels)
 python main.py --quiet
 ```
 
@@ -72,15 +72,15 @@ itinerary, redirect stdout: `python main.py > trip.json`.
 | File               | Purpose                                             |
 | ------------------ | --------------------------------------------------- |
 | `main.py`          | Main script: pick cities → call Gemini → validate → print |
-| `requirements.txt` | Pinned dependencies (`google-genai`, `pydantic`)    |
+| `requirements.txt` | Pinned dependencies (`google-genai`, `pydantic`, `rich`) |
 | `.venv/`           | Local virtual environment (gitignored)              |
 
 ## Notes
 
 - Model is set via the `MODEL` constant in `main.py` (default: `gemini-2.5-flash-lite`).
   The model must be enabled in your Vertex project/location.
-- Project and location are read from `GOOGLE_CLOUD_PROJECT` and
-  `GOOGLE_CLOUD_LOCATION`; nothing is hardcoded or committed.
+- Project and location come from `GOOGLE_CLOUD_PROJECT` / `GOOGLE_CLOUD_LOCATION` when set,
+  otherwise from the active gcloud project and `global`; nothing is hardcoded or committed.
 - The Pydantic schema is the single source of truth for the output shape — change the
   `Itinerary` / `DayPlan` models and the response schema and validation follow automatically.
 - `response.parsed` returns the JSON already validated into a typed `Itinerary`; the raw
