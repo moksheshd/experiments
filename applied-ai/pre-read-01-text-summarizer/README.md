@@ -1,11 +1,11 @@
 # pre-read-01: Text Summarizer
 
-Summarize a long text file using Claude on **Google Vertex AI**, via the official
-[Anthropic Python SDK](https://github.com/anthropics/anthropic-sdk-python).
+Summarize a long text file using Gemini on **Google Vertex AI**, via the official
+[Google Gen AI SDK](https://github.com/googleapis/python-genai).
 
 ## What it does
 
-Reads a text file, sends its contents to Claude (through Vertex AI), and prints a
+Reads a text file, sends its contents to Gemini (through Vertex AI), and prints a
 concise summary (one-sentence overview + key bullets) to stdout.
 
 ## Setup
@@ -22,38 +22,37 @@ Authenticate with Google Application Default Credentials (once):
 gcloud auth application-default login
 ```
 
-Set the Vertex configuration (these are read by the SDK's `AnthropicVertex` client):
+Set the Vertex configuration (these point the `google-genai` client at the Vertex backend):
 
 ```bash
-export ANTHROPIC_VERTEX_PROJECT_ID="your-gcp-project-id"
-export CLOUD_ML_REGION="global"        # or a specific region, e.g. us-east5
+export GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
+export GOOGLE_CLOUD_LOCATION="global"        # or a specific location, e.g. us-central1
 ```
 
-No Anthropic API key is required — auth flows through GCP ADC.
+No API key is required — auth flows through GCP ADC.
 
 ## Usage
 
 ```bash
 # Summarize the bundled sample (input.txt)
-python summarize.py
+python main.py
 
 # Summarize your own file
-python summarize.py path/to/your/file.txt
+python main.py path/to/your/file.txt
 ```
 
 ## Files
 
 | File               | Purpose                                        |
 | ------------------ | ---------------------------------------------- |
-| `summarize.py`     | Main script: read file → call Claude → print   |
+| `main.py`          | Main script: read file → call Gemini → print   |
 | `input.txt`        | Sample long text (ISRO Chandrayaan-3 mission)  |
-| `requirements.txt` | Pinned dependencies (`anthropic[vertex]`)      |
+| `requirements.txt` | Pinned dependencies (`google-genai`)           |
 | `.venv/`           | Local virtual environment (gitignored)         |
 
 ## Notes
 
-- Model is set via the `MODEL` constant in `summarize.py` (default: `claude-opus-4-8`).
-  The model must be enabled in your Vertex project/region.
-- On Vertex AI, model IDs use the bare first-party string (no `anthropic.` prefix).
-- Project and region are read from `ANTHROPIC_VERTEX_PROJECT_ID` and
-  `CLOUD_ML_REGION`; nothing is hardcoded or committed.
+- Model is set via the `MODEL` constant in `main.py` (default: `gemini-2.5-flash-lite`).
+  The model must be enabled in your Vertex project/location.
+- Project and location are read from `GOOGLE_CLOUD_PROJECT` and
+  `GOOGLE_CLOUD_LOCATION`; nothing is hardcoded or committed.
