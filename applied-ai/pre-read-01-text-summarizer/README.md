@@ -52,7 +52,7 @@ python main.py --quiet
 | ------------------ | ---------------------------------------------- |
 | `main.py`          | Main script: read file → call Gemini → print   |
 | `input.txt`        | Sample long text (ISRO Chandrayaan-3 mission)  |
-| `requirements.txt` | Pinned dependencies (`google-genai`)           |
+| `requirements.txt` | Pinned dependencies (`google-genai`, `rich`)   |
 | `.venv/`           | Local virtual environment (gitignored)         |
 
 ## Notes
