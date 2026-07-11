@@ -1,0 +1,2 @@
+anthropic[vertex]==0.116.0
+pydantic==2.13.4
