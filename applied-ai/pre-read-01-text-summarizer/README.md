@@ -22,11 +22,11 @@ Authenticate with Google Application Default Credentials (once):
 gcloud auth application-default login
 ```
 
-Set the Vertex configuration (these point the `google-genai` client at the Vertex backend):
+By default the script uses your **active gcloud project** and the `global` location, so no
+extra config is needed. To override for a single run (without exporting), prefix the command:
 
 ```bash
-export GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
-export GOOGLE_CLOUD_LOCATION="global"        # or a specific location, e.g. us-central1
+GOOGLE_CLOUD_PROJECT="your-gcp-project-id" GOOGLE_CLOUD_LOCATION="us-central1" python main.py
 ```
 
 No API key is required — auth flows through GCP ADC.
@@ -35,10 +35,15 @@ No API key is required — auth flows through GCP ADC.
 
 ```bash
 # Summarize the bundled sample (input.txt)
+# The request (system prompt + input) and response (token usage + summary)
+# are rendered as rich panels on stderr; the summary itself goes to stdout.
 python main.py
 
 # Summarize your own file
 python main.py path/to/your/file.txt
+
+# Hide the panels; print only the summary
+python main.py --quiet
 ```
 
 ## Files
@@ -54,5 +59,5 @@ python main.py path/to/your/file.txt
 
 - Model is set via the `MODEL` constant in `main.py` (default: `gemini-2.5-flash-lite`).
   The model must be enabled in your Vertex project/location.
-- Project and location are read from `GOOGLE_CLOUD_PROJECT` and
-  `GOOGLE_CLOUD_LOCATION`; nothing is hardcoded or committed.
+- Project and location come from `GOOGLE_CLOUD_PROJECT` / `GOOGLE_CLOUD_LOCATION` when set,
+  otherwise from the active gcloud project and `global`; nothing is hardcoded or committed.
