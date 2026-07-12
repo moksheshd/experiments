@@ -1,9 +1,10 @@
-"""Verify Google Drive / Docs / Sheets API calls using desktop OAuth creds.
+"""Verify Google Drive / Docs / Sheets / Calendar API calls using desktop OAuth creds.
 
 What it does:
   1. Lists files in your Drive.
   2. Reads a Google Doc  (Docs API).
   3. Reads a Google Sheet (Sheets API).
+  4. Lists upcoming Calendar events (Calendar API).
 
 Runs the installed-app OAuth flow (opens a browser once), caches the token in
 token.json, then makes the calls above.
@@ -14,6 +15,7 @@ Usage:
 """
 
 import argparse
+import datetime
 import os
 
 from google.auth.transport.requests import Request
@@ -26,6 +28,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.readonly",
     "https://www.googleapis.com/auth/documents.readonly",
     "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/calendar.readonly",
 ]
 
 CLIENT_SECRETS = os.path.expanduser(
@@ -139,6 +142,37 @@ def read_sheet(sheet_id):
     print()
 
 
+def read_calendar(max_results=10):
+    print("=" * 60)
+    print("4. LIST CALENDAR EVENTS")
+    print("=" * 60)
+    calendar = build("calendar", "v3", credentials=CREDS)
+
+    # RFC3339 "now" in UTC; Calendar API wants the trailing Z.
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    resp = (
+        calendar.events()
+        .list(
+            calendarId="primary",
+            timeMin=now,
+            maxResults=max_results,
+            singleEvents=True,
+            orderBy="startTime",
+        )
+        .execute()
+    )
+    events = resp.get("items", [])
+    print(f"  --- next {len(events)} upcoming events ---")
+    if not events:
+        print("  (no upcoming events)")
+    for event in events:
+        start = event.get("start", {})
+        when = start.get("dateTime") or start.get("date") or "?"
+        summary = event.get("summary", "(no title)")
+        print(f"  - {when}  {summary}")
+    print()
+
+
 def pick(files, mime):
     for f in files:
         if f["mimeType"] == mime:
@@ -170,6 +204,8 @@ def main():
         read_sheet(sheet_id)
     else:
         print("3. READ GOOGLE SHEET — skipped (no Sheet found; pass --sheet SHEET_ID)\n")
+
+    read_calendar()
 
     print("✅ Done.")
 
