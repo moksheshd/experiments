@@ -29,7 +29,6 @@ normal run needs nothing exported:
 """
 
 import argparse
-import json
 import logging
 import os
 import random
@@ -39,10 +38,8 @@ import sys
 from google import genai
 from google.genai import types
 from pydantic import BaseModel
-from rich.console import Console, Group
-from rich.json import JSON
-from rich.panel import Panel
-from rich.text import Text
+
+import render
 
 MODEL = "gemini-2.5-flash-lite"
 MAX_TOKENS = 2048
@@ -101,30 +98,6 @@ def gcloud_default_project() -> str | None:
     return project or None
 
 
-def render_request(console: Console, prompt: str, schema: dict) -> None:
-    """Pretty-print the outgoing request: prompt text + the response schema."""
-    header = Text.assemble(
-        ("model:  ", "bold"), f"{MODEL}\n",
-        ("tokens: ", "bold"), f"max_output_tokens={MAX_TOKENS}\n\n",
-        ("prompt:\n", "bold"), (prompt, "italic"),
-        ("\n\nresponse_schema:", "bold"),
-    )
-    body = Group(header, JSON(json.dumps(schema)))
-    console.print(Panel(body, title="[bold cyan]→ Request[/]", border_style="cyan"))
-
-
-def render_response(console: Console, raw_json: str, usage, finish_reason) -> None:
-    """Pretty-print the incoming response: token usage + the JSON body."""
-    header = Text.assemble(
-        ("finish_reason: ", "bold"), f"{finish_reason}\n",
-        ("tokens in/out: ", "bold"),
-        f"{usage.prompt_token_count}/{usage.candidates_token_count}\n\n",
-        ("body:", "bold"),
-    )
-    body = Group(header, JSON(raw_json))
-    console.print(Panel(body, title="[bold green]← Response[/]", border_style="green"))
-
-
 def pick_cities() -> tuple[str, str]:
     source, destination = random.sample(CITIES, 2)
     log.info("Picked cities from a pool of %d: %s -> %s", len(CITIES), source, destination)
@@ -132,7 +105,7 @@ def pick_cities() -> tuple[str, str]:
 
 
 def generate_itinerary(
-    client: genai.Client, console: Console | None, source: str, destination: str
+    client: genai.Client, verbose: bool, source: str, destination: str
 ) -> Itinerary:
     # Step 1: the Pydantic model IS the response schema; this is the shape Gemini
     # is constrained to.
@@ -153,8 +126,8 @@ def generate_itinerary(
         max_output_tokens=MAX_TOKENS,
     )
     log.info("Calling %s with response_schema=Itinerary ...", MODEL)
-    if console is not None:
-        render_request(console, prompt, schema)
+    if verbose:
+        render.request(MODEL, MAX_TOKENS, prompt, schema)
 
     response = client.models.generate_content(model=MODEL, contents=prompt, config=config)
 
@@ -167,8 +140,8 @@ def generate_itinerary(
         usage.candidates_token_count,
     )
     # Step 3: show what the model actually emitted (raw JSON text) before validation.
-    if console is not None:
-        render_response(console, response.text, usage, finish_reason)
+    if verbose:
+        render.response(response.text, usage, finish_reason)
 
     # Step 4: response.parsed is the JSON already validated + coerced into the
     # typed Pydantic model. This is where a missing field or wrong type would raise.
@@ -209,8 +182,9 @@ def main() -> None:
         datefmt="%H:%M:%S",
         stream=sys.stderr,
     )
-    # Rich panels go to stderr so stdout stays pure JSON; --quiet turns them off.
-    console = None if args.quiet else Console(stderr=True)
+    # Panels (see render.py) go to stderr so stdout stays pure JSON; --quiet
+    # turns them off.
+    verbose = not args.quiet
 
     if args.seed is not None:
         random.seed(args.seed)
@@ -233,7 +207,7 @@ def main() -> None:
     log.info("Creating google-genai Vertex client [project=%s, location=%s]", project_id, location)
     client = genai.Client(vertexai=True, project=project_id, location=location)
 
-    itinerary = generate_itinerary(client, console, source, destination)
+    itinerary = generate_itinerary(client, verbose, source, destination)
 
     log.info("Writing itinerary JSON to stdout")
     print(itinerary.model_dump_json(indent=2))
