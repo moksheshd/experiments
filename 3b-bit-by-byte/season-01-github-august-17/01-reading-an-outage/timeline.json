@@ -1,0 +1,182 @@
+{
+  "incident": "GitHub.com outage, August 17, 2026",
+  "window_utc": "13:28 to 21:15 UTC",
+  "duration": "7h47m",
+  "note": "Ordering is approximate. GitHub's report does not timestamp every causal step, so events are arranged to read as a narrative, not as a precise second-by-second log. Every 'observed' line is drawn only from GitHub's incident report or status page.",
+  "sources": [
+    "https://github.blog/news-insights/company-news/the-august-17-outage-and-the-work-ahead/",
+    "https://www.githubstatus.com/incidents/zkxwbgr0cnmx"
+  ],
+  "events": [
+    {
+      "id": "onset",
+      "time": "13:28 UTC",
+      "observed": "GitHub.com begins serving elevated errors and latency across Issues, Pull Requests, APIs, Actions, and Copilot.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "context",
+      "unpacked_in": 1,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "error-rates",
+      "time": "at peak",
+      "observed": "Web and API error rates reach ~20%. Archive and raw file downloads reach ~50%.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "context",
+      "unpacked_in": 1,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "immediate-cause",
+      "time": "onset",
+      "observed": "GitHub's stated immediate cause: network saturation on load balancers in the Central US datacenter, following a new peak in traffic.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 5,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "origin-sidecar",
+      "time": "onset",
+      "observed": "GitHub names the origin: an Istio sidecar pod reached its concurrency limits.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 2,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "autoscale-miss",
+      "time": "onset",
+      "observed": "The sidecar failed to autoscale correctly: a misconfigured policy watched the host service, not the sidecar's own limits.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 3,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "retry-overload",
+      "time": "during incident",
+      "observed": "Optimistic retry logic overloaded internal load balancers, worsening the failure.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 4,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "haproxy",
+      "time": "during incident",
+      "observed": "The failure cascaded until four HAProxy nodes exhausted their flow limits, degrading the gateway authentication path and causing widespread authentication latency and failures.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 5,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "auth-surfaces",
+      "time": "during incident",
+      "observed": "SAML/OIDC authentication, SCIM, and Team Sync are affected, alongside the other product surfaces.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 5,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "failover",
+      "time": "during incident",
+      "observed": "Some failing traffic is moved from Central US to Northern Virginia, where it is served successfully until the Central US network failure is resolved.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 6,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "copilot-storm",
+      "time": "during incident",
+      "observed": "Delayed replies from one internal endpoint trigger a latent retry bug in VS Code, amplifying traffic ~10x. Copilot Token Service goes from a normal ~7-9K RPS to ~70-100K RPS.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 6,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "recovery-most",
+      "time": "16:36 UTC",
+      "observed": "Most services recover as the Central US datacenter recovers.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "context",
+      "unpacked_in": 1,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "recovery-actions",
+      "time": "~18:03 UTC",
+      "observed": "Actions remains degraded until about 18:03 UTC.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "context",
+      "unpacked_in": 1,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "haproxy-pause",
+      "time": "during recovery",
+      "observed": "Pausing HAProxy on the affected nodes simultaneously produces immediate broad recovery.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 7,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "copilot-mitigation",
+      "time": "during recovery",
+      "observed": "The Northern VA retry storm is resolved by reducing gateway retry logic (a PR) and blocking Copilot Token Service requests at the load balancers with a 403, then ramping traffic back up per-site.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 7,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "scraping",
+      "time": "during recovery",
+      "observed": "Scraping attacks on codeload endpoints complicate the recovery.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 7,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "recovery-copilot",
+      "time": "21:02 UTC",
+      "observed": "Copilot Token Service fully recovers at about 21:02 UTC, hours after everything else.",
+      "source": "github-report",
+      "bucket": "github-says",
+      "kind": "causal",
+      "unpacked_in": 6,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    },
+    {
+      "id": "resolved",
+      "time": "21:15 UTC",
+      "observed": "The incident is marked resolved. Total duration 7h47m.",
+      "source": "status-page",
+      "bucket": "github-says",
+      "kind": "context",
+      "unpacked_in": 1,
+      "answer": { "what_ran_out": "", "mechanism": "" }
+    }
+  ]
+}
