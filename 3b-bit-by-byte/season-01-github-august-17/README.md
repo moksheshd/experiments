@@ -17,6 +17,7 @@ the terminal. Each lab still runs with a single `go run .`.
 | Chapter | Folder | What it shows |
 |---------|--------|---------------|
 | 1 | [`01-reading-an-outage/`](01-reading-an-outage/) | A thinking tool: read the incident by asking "what ran out?" |
+| 2 | [`02-proxy-concurrency/`](02-proxy-concurrency/) | A proxy saturates at its concurrency limit while the service behind it stays idle. |
 
 More labs appear here as later chapters publish.
 
