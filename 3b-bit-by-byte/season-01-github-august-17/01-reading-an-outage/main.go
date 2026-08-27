@@ -94,8 +94,9 @@ func printHeader(tl timeline, answersUpTo int) {
 	fmt.Println()
 	fmt.Println(styles.Header("3B: Bit By Byte   Chapter 1: Reading an Outage", meta))
 	fmt.Println()
-	fmt.Println(styles.Sub.Render("For each CAUSAL event, ask: what ran out here, and what did that"))
-	fmt.Println(styles.Sub.Render("cause to run out next? Some links are not exhaustion at all. Say so."))
+	fmt.Println(styles.Sub.Render("For each CAUSAL event, ask: what constraint was hit here, and what"))
+	fmt.Println(styles.Sub.Render("did it cause to give next? \"What ran out?\" is the shorthand, as long"))
+	fmt.Println(styles.Sub.Render("as you remember not every constraint is literal exhaustion."))
 	if answersUpTo <= 0 {
 		fmt.Println(styles.Sub.Render("Answers are hidden. Reveal what a chapter has earned with --answers=N."))
 	} else {
