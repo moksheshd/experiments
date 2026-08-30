@@ -36,27 +36,48 @@ const (
 	scaleMax   = 150.0                 // fixed bar scale so the ceiling is visible
 	barWidth   = 40
 	refresh    = 120 * time.Millisecond
+	maxLimit   = 200 // largest proxy limit you can dial to; sizes the slot bucket
 )
 
 // engine is the live Client -> Proxy -> Service system. The TUI reads its atomics
 // each frame; a manager goroutine keeps the worker count equal to `desired`.
+//
+// The proxy is a bucket of slot tokens, exactly like ../main.go and
+// ../minimal/main.go: a buffered channel you must take a token from to reach the
+// service. The only twist is that the bucket has to resize while you hold down an
+// arrow key, and a Go channel's capacity is fixed at creation. So the channel is
+// sized once to maxLimit and we control the *live* limit by how many tokens are
+// in circulation: `reconcile` adds tokens to grow the limit and drains them to
+// shrink it. Fewer tokens in the bucket, fewer requests admitted at once.
 type engine struct {
-	limit    atomic.Int64 // proxy concurrency limit (adjustable)
-	desired  atomic.Int64 // how many client workers should be running (adjustable)
-	inFlight atomic.Int64 // requests currently inside the service (live)
+	sem         chan struct{} // the proxy: a bucket of slot tokens (cap = maxLimit)
+	limit       atomic.Int64  // proxy concurrency limit you dial with left/right
+	circulating atomic.Int64  // tokens currently in the bucket + in flight
+	desired     atomic.Int64  // how many client workers should be running (adjustable)
+	inFlight    atomic.Int64  // requests currently inside the service (live)
 
 	winPeak    atomic.Int64 // peak service in-flight this frame (reset each snapshot)
 	winSuccess atomic.Int64 // successes this frame (reset each snapshot)
 	winTotal   atomic.Int64 // attempts this frame (reset each snapshot)
 }
 
-// run is the manager loop: it spawns and stops client workers so the live worker
-// count tracks `desired`. Each worker hammers the proxy in a closed loop.
+func newEngine() *engine {
+	e := &engine{sem: make(chan struct{}, maxLimit)}
+	e.limit.Store(50)
+	e.desired.Store(30)
+	return e
+}
+
+// run is the manager loop: each tick it resizes the slot bucket to match the
+// live limit and spawns or stops client workers so the live worker count tracks
+// `desired`. Each worker hammers the proxy in a closed loop.
 func (e *engine) run() {
 	var stops []chan struct{}
 	t := time.NewTicker(30 * time.Millisecond)
 	defer t.Stop()
 	for range t.C {
+		e.reconcile()
+
 		want := int(e.desired.Load())
 		for len(stops) < want {
 			s := make(chan struct{})
@@ -70,10 +91,32 @@ func (e *engine) run() {
 	}
 }
 
+// reconcile brings the number of slot tokens in circulation in line with the
+// live limit: it adds tokens to the bucket to grow the limit, and drains free
+// tokens to shrink it. Shrinking only removes slots that are currently free; if
+// every slot is in use it removes what it can now and catches up on later ticks
+// as requests finish and return their tokens.
+func (e *engine) reconcile() {
+	for e.circulating.Load() < e.limit.Load() {
+		select {
+		case e.sem <- struct{}{}: // add a slot to the bucket
+			e.circulating.Add(1)
+		default:
+			return // bucket at maxLimit; nothing more to add
+		}
+	}
+	for e.circulating.Load() > e.limit.Load() {
+		select {
+		case <-e.sem: // remove a currently-free slot
+			e.circulating.Add(-1)
+		default:
+			return // no free slot right now; try again next tick
+		}
+	}
+}
+
 // worker is one client: fire a request, tally the result, repeat until stopped.
 func (e *engine) worker(stop <-chan struct{}) {
-	// Each worker holds its own proxy slot for the duration of a served request,
-	// so the shared limit is enforced by comparing in-flight against the limit.
 	for {
 		select {
 		case <-stop:
@@ -87,26 +130,24 @@ func (e *engine) worker(stop <-chan struct{}) {
 	}
 }
 
-// serve is one request's whole life. The proxy admits it only if fewer than
-// `limit` requests are already in flight; otherwise it is rejected at the door.
-// This models the same capacity constraint as ../main.go's semaphore, using a
-// live-adjustable limit.
+// serve is one request's whole life. Take a slot token from the proxy bucket; if
+// the bucket is empty we are rejected at the door. Otherwise the service does its
+// work and we return the token. This is the same channel-semaphore as
+// ../main.go and ../minimal/main.go, just drawing from a bucket whose size the
+// arrow keys can change.
 func (e *engine) serve() bool {
-	limit := e.limit.Load()
-	// Try to claim a slot: bump in-flight, but only if we stay within the limit.
-	for {
-		cur := e.inFlight.Load()
-		if cur >= limit {
-			// Proxy full: rejected. Back off one service time (the slot will not
-			// free sooner) so the closed loop does not spin at CPU speed.
-			time.Sleep(serviceDur)
-			return false
-		}
-		if e.inFlight.CompareAndSwap(cur, cur+1) {
-			updatePeak(&e.winPeak, cur+1)
-			break
-		}
+	select {
+	case <-e.sem: // got a slot
+	default:
+		// Proxy full: rejected. Back off one service time (a slot will not free
+		// sooner) so the closed loop does not spin at CPU speed.
+		time.Sleep(serviceDur)
+		return false
 	}
+	defer func() { e.sem <- struct{}{} }() // return the slot on the way out
+
+	n := e.inFlight.Add(1)
+	updatePeak(&e.winPeak, n)
 	time.Sleep(serviceDur) // the service's real work
 	e.inFlight.Add(-1)
 	return true
@@ -171,13 +212,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "q", "ctrl+c", "esc":
 			return m, tea.Quit
 		case "up", "k":
-			m.e.desired.Store(clamp(m.e.desired.Load()+5, 0, 200))
+			m.e.desired.Store(clamp(m.e.desired.Load()+5, 0, maxLimit))
 		case "down", "j":
-			m.e.desired.Store(clamp(m.e.desired.Load()-5, 0, 200))
+			m.e.desired.Store(clamp(m.e.desired.Load()-5, 0, maxLimit))
 		case "right", "l":
-			m.e.limit.Store(clamp(m.e.limit.Load()+10, 1, 200))
+			m.e.limit.Store(clamp(m.e.limit.Load()+10, 1, maxLimit))
 		case "left", "h":
-			m.e.limit.Store(clamp(m.e.limit.Load()-10, 1, 200))
+			m.e.limit.Store(clamp(m.e.limit.Load()-10, 1, maxLimit))
 		}
 	case tickMsg:
 		m.inFlight, m.peak, m.rate = m.e.snapshot()
@@ -268,9 +309,7 @@ func clamp(v, lo, hi int64) int64 {
 func itoa(v int64) string { return fmt.Sprintf("%d", v) }
 
 func main() {
-	e := &engine{}
-	e.limit.Store(50)
-	e.desired.Store(30)
+	e := newEngine()
 	go e.run()
 
 	p := tea.NewProgram(model{e: e})
