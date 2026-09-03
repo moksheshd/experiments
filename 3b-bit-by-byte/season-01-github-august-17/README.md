@@ -18,8 +18,13 @@ the terminal. Each lab still runs with a single `go run .`.
 |---------|--------|---------------|
 | 1 | [`01-reading-an-outage/`](01-reading-an-outage/) | A thinking tool: read the incident by asking "what ran out?" |
 | 2 | [`02-proxy-concurrency/`](02-proxy-concurrency/) | A proxy saturates at its concurrency limit while the service behind it stays idle. |
+| 3 | [`03-autoscaling-blind-spot/`](03-autoscaling-blind-spot/) | An autoscaler watching CPU never fires while concurrency saturates; point it at the right signal and it reacts. |
+| 4 | [`04-retry-amplification/`](04-retry-amplification/) | Naive retries balloon the load on an overloaded service; backoff, jitter, and a budget tame the same load. |
+| 5 | [`05-shared-bottleneck/`](05-shared-bottleneck/) | Three healthy endpoints fall together behind one shared auth pool; a bulkhead keeps the blast radius local. |
+| 6 | [`06-client-retry-storm/`](06-client-retry-storm/) | A client retry bug turns a slow endpoint into a tenfold storm; failover does nothing, client discipline flattens it. |
+| 7 | [`07-rebuilding-to-survive/`](07-rebuilding-to-survive/) | The whole chain under one load, fragile vs resilient: folds link by link, or bends and stays up. |
 
-More labs appear here as later chapters publish.
+More seasons and labs appear here as the series continues.
 
 ## Install Go
 
